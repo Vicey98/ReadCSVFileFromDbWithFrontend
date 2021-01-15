@@ -33,7 +33,6 @@ public class DayTickService {
                 DayTick dt = new DayTick(null, tokens[0], tokens[1], Double.parseDouble(tokens[2]), Double.parseDouble(tokens[3]), 
                 Double.parseDouble(tokens[4]),Double.parseDouble(tokens[5]), Long.parseLong((tokens[6])), Long.parseLong(tokens[7]));
                 // Date date = new SimpleDateFormat("MMM dd, YYYY").parse((tokens[1].replaceAll("\"", "")));
-
                 dtrepo.save(dt);
             }
             br.close();
@@ -53,9 +52,20 @@ public class DayTickService {
         }
     }
 
-    public void filterByMarketCap() {
-        DayTick dt = dtrepo.findByName("tezos");
-        System.out.println(dt);
+    public Iterable<DayTick> getPriceChangeDataByDate() {
+        Iterable<DayTick> itr = dtrepo.getPriceChangeDataByDate("tezos");
+
+        return dtrepo.getPriceChangeDataByDate("tezos");
     }
+
+    // Get price change of individual coins 
+    // Then add them to a single json
+    // Then return
+
+    // OR
+
+    // Create a price change table on dataLoader
+    // Then create a return statement in the DayTickRepo
+    // Need to do: Create Model: PriceChange, Repo, 
 
 }
