@@ -1,6 +1,6 @@
 package com.lukeProject.ReadCSVWFrontend.model;
 
-import java.util.Date;  
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,31 +11,30 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @Data
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class DayTick {
-
+public class PriceChange {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // Could use a composite key of name & date but not required in this case
-
-    private String name;
 
     private Date date;
 
-    private double open;
+    private String coinName;
 
-    private double high;
+    private double price;
 
-    private double low;
+    private double dayChange;
 
-    private double close;
+    private double weekChange;
 
-    private Long volume;
+    private double monthChange;
 
-    private Long market_cap;
-    
+    private Long dayVolume;
+
+    private Long marketCap;
+
 }

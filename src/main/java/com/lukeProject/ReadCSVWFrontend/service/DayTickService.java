@@ -6,9 +6,11 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import com.lukeProject.ReadCSVWFrontend.repository.DayTickRepository;
+import com.lukeProject.ReadCSVWFrontend.repository.PriceChangeRepository;
 import com.lukeProject.ReadCSVWFrontend.model.DayTick;
+import com.lukeProject.ReadCSVWFrontend.model.PriceChange;
 import java.text.*;
-import java.util.Date;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,53 +21,72 @@ public class DayTickService {
     @Autowired
     private DayTickRepository dtrepo;
 
-    public void loadDataToDb() {
-        String line = "";
+    @Autowired
+    private PriceChangeRepository pcrepo;
 
+    String line = "";
+
+    public void loadDataToDb() {
+        Map<String, List<DayTick>> allTickDataGivenCoinMap = new HashMap<String, List<DayTick>>();
         try {
             BufferedReader br = new BufferedReader(new FileReader("src/main/resources/crypto_historical_data.csv"));
+            // Skips header
             br.readLine();
             while ((line = br.readLine()) != null) {
                 String[] tokens = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
                 for(int i = 0; i < tokens.length; i++) {
                     tokens[i] = tokens[i].replaceAll("\"", "").replaceAll(",","");
                 }
-                DayTick dt = new DayTick(null, tokens[0], tokens[1], Double.parseDouble(tokens[2]), Double.parseDouble(tokens[3]), 
+                DateFormat df = new SimpleDateFormat("MMM dd yyyy", Locale.ENGLISH); 
+                Date date = df.parse(tokens[1]);
+                DayTick dt = new DayTick(null, tokens[0], date, Double.parseDouble(tokens[2]), Double.parseDouble(tokens[3]), 
                 Double.parseDouble(tokens[4]),Double.parseDouble(tokens[5]), Long.parseLong((tokens[6])), Long.parseLong(tokens[7]));
-                // Date date = new SimpleDateFormat("MMM dd, YYYY").parse((tokens[1].replaceAll("\"", "")));
                 dtrepo.save(dt);
+                List<DayTick> temp = allTickDataGivenCoinMap.get(tokens[0]);
+                if (temp == null) {
+                    temp = new ArrayList<DayTick>();
+                    allTickDataGivenCoinMap.put(tokens[0], temp);
+                }
+                temp.add(dt);
             }
-            br.close();
-
-            SimpleDateFormat sdf = new SimpleDateFormat("mm dd YYYY");
-            String dateInString = "12 04 1998";
-            Date date = sdf.parse(dateInString);
-            System.out.println(date);
+            br.close(); 
 
         } catch (FileNotFoundException e) {
+            System.out.println("File not found");
             e.printStackTrace();
-            // I should write but eh
         } catch (IOException e) {
+            System.out.println("IO exception in loading data");
             e.printStackTrace();
         } catch (ParseException e) {
+            System.out.println("Date malformatted in csv");
             e.printStackTrace();
         }
+        generatePriceChangeTable(allTickDataGivenCoinMap);
     }
 
-    public Iterable<DayTick> getPriceChangeDataByDate() {
-        Iterable<DayTick> itr = dtrepo.getPriceChangeDataByDate("tezos");
+    public void generatePriceChangeTable(Map<String, List<DayTick>> allDTMap) {
 
-        return dtrepo.getPriceChangeDataByDate("tezos");
+        for (String key : allDTMap.keySet()) {
+            PriceChange pc = new PriceChange();
+            pc.setCoinName(key);
+            for (int i = 0; i < allDTMap.get(key).size(); i++) {
+                DayTick mostRecentDT = allDTMap.get(key).get(0);
+                DayTick currentDT = allDTMap.get(key).get(i);
+                DecimalFormat df = new DecimalFormat("#.#");    
+                if (i == 0) {
+                    pc.setDate(mostRecentDT.getDate());
+                    pc.setPrice(mostRecentDT.getClose());
+                    pc.setDayVolume(mostRecentDT.getVolume());
+                    pc.setMarketCap(mostRecentDT.getMarket_cap());
+                } else if (i == 1) {
+                    pc.setDayChange(Double.valueOf(df.format((mostRecentDT.getClose() - currentDT.getClose())/currentDT.getClose() * 100)));
+                } else if (i == 6) {
+                    pc.setWeekChange(Double.valueOf(df.format((mostRecentDT.getClose() - currentDT.getClose())/currentDT.getClose() * 100)));
+                } else if (i == 27) {
+                    pc.setMonthChange(Double.valueOf(df.format((mostRecentDT.getClose() - currentDT.getClose())/currentDT.getClose() * 100)));
+                }
+            }
+            pcrepo.save(pc);
+        }
     }
-
-    // Get price change of individual coins 
-    // Then add them to a single json
-    // Then return
-
-    // OR
-
-    // Create a price change table on dataLoader
-    // Then create a return statement in the DayTickRepo
-    // Need to do: Create Model: PriceChange, Repo, 
-
 }

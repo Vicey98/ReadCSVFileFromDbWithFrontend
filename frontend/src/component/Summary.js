@@ -3,37 +3,34 @@ import { Container, Table } from 'reactstrap';
 
 class Summary extends Component {
     state = { 
-        Data: [],
-        tempData: 0,
+        PriceChange:[],
+        TempData: 0,
      }
 
     async componentDidMount() {
-        const response = await fetch('api/DailyTick/Summary');
-        const body = await response.json();
-        this.setState({Data: body});
-        console.log(body);
+        let response = await fetch('api/dailytick/pricechange');
+        let body = await response.json();
+        this.setState({PriceChange: body});
+        // console.log(body2);
     }
 
     render() { 
-
-        const {Data} = this.state;
+        const {PriceChange} = this.state;
 
         let rows = 
-            Data.map( Data =>
+        PriceChange.map((PriceChange, index) => 
                 <tr>
-                    <td>{this.state.tempData}</td>
-                    <td>{Data[0]}</td>
-                    <td>{this.state.tempData}</td> 
-                    {/* price */}
-                    <td>{Data[1]}</td>
-                    {/* 24hr */}
-                    <td>{Data[2]}</td>
-                    <td>{this.state.tempData}</td>
-                    <td>{this.state.tempData}</td>
-                    {/* volume */}
-                    <td>{this.state.tempData}</td>
-                </tr>            
-                )
+                    <td>{this.state.TempData}</td>
+                    <td>{PriceChange[0]}</td>
+                    <td>{PriceChange[1]}</td>
+                    <td>{PriceChange[2]}</td>
+                    <td>{PriceChange[3]}</td>
+                    <td>{PriceChange[4]}</td>
+                    <td>{PriceChange[5]}</td>
+                    <td>{PriceChange[6]}</td>
+                    <td>{PriceChange[7]}</td>
+                </tr>   
+        )
 
         return ( 
         <div>
