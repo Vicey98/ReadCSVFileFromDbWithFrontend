@@ -1,19 +1,19 @@
 # ReadCSVFileFromDbWithFrontend
 Loads a CSV file into an in-memory database and displays the data in a table
 
-Project title
+Project title: 
 ReadCSVFileFromDbWithFrontend
 
-Motivation
+Motivation: 
 UTU Technical Interview round 1
 
-Tech/framework used
-Spring & ReactJS
+Tech/framework used: 
+Java, Spring, ReactJS
 
-Tests
+Tests: 
 Misc tests for model components
 
-How to use?
+How to use? 
 Run Backend from main and npm start in frontend folder. 
 
 Expansion
