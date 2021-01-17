@@ -26,10 +26,11 @@ public class DayTickService {
 
     String line = "";
 
-    public void loadDataToDb() {
+    public void loadDataToDb(String file) {
         Map<String, List<DayTick>> allTickDataGivenCoinMap = new HashMap<String, List<DayTick>>();
+        file = file.length() == 0 ? "src/main/resources/crypto_historical_data.csv" : file;
         try {
-            BufferedReader br = new BufferedReader(new FileReader("src/main/resources/crypto_historical_data.csv"));
+            BufferedReader br = new BufferedReader(new FileReader(file));
             // Skips header
             br.readLine();
             while ((line = br.readLine()) != null) {

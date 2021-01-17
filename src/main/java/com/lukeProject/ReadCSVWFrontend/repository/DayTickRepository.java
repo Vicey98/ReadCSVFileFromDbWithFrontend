@@ -8,8 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DayTickRepository extends JpaRepository<DayTick, Long> {
-    DayTick findByName(String name);
-    
     @Query("SELECT SUM(a.market_cap) FROM DayTick a WHERE a.name like 'tezos'")
     Iterable<DayTick> findByName2();
 
